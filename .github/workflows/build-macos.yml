@@ -1,0 +1,45 @@
+# 在 GitHub 的 macOS 托管机器上打包未签名的 图片工坊.app。
+# 必须推到 GitHub 的默认分支后，Actions 才会出现并运行。Linux 无法交叉编译这个 .app。
+
+name: Build macOS app
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: macos-latest
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build 图片工坊.app
+        run: bash build_macos.sh
+
+      - name: Show dist
+        run: ls -la dist
+
+      # ditto 会保留 .app 里的符号链接和资源叉。再交给 upload-artifact 时不再二次压缩。
+      - name: Zip app bundle
+        run: ditto -c -k --keepParent "dist/图片工坊.app" "图片工坊-macos.zip"
+
+      - name: Upload app zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-workbench-macos
+          path: 图片工坊-macos.zip
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
