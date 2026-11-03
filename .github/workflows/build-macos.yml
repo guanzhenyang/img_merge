@@ -1,4 +1,4 @@
-# 在 GitHub 的 macOS 托管机器上打包未签名的 图片工坊.app。
+# 在 GitHub 的 macOS Intel 托管机器上打包未签名的 图片工坊.app（x86_64）。
 # 必须推到 GitHub 的默认分支后，Actions 才会出现并运行。Linux 无法交叉编译这个 .app。
 
 name: Build macOS app
@@ -13,8 +13,8 @@ permissions:
 
 jobs:
   build:
-    name: macos-latest
-    runs-on: macos-latest
+    name: macos-intel
+    runs-on: macos-15-intel
     timeout-minutes: 45
     steps:
       - name: Checkout
@@ -27,6 +27,11 @@ jobs:
 
       - name: Build 图片工坊.app
         run: bash build_macos.sh
+
+      - name: Verify Intel architecture
+        run: |
+          uname -m
+          file "dist/图片工坊.app/Contents/MacOS/图片工坊"
 
       - name: Show dist
         run: ls -la dist

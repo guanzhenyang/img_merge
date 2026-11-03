@@ -123,7 +123,7 @@ xattr -dr com.apple.quarantine "dist/图片工坊.app"
 
 ### 用 GitHub Actions 打包
 
-仓库里的 `.github/workflows/build-macos.yml` 会在 GitHub 的 `macos-latest` 上安装 Python 3.12，执行 `build_macos.sh`，并把打好的应用做成 zip 上传为 Actions 产物。应用没有签名，也没有公证。Windows 的 `build_windows.bat` / `build_windows.ps1` 不变，这个工作流不负责 Windows exe。
+仓库里的 `.github/workflows/build-macos.yml` 会在 GitHub 的 **Intel** 托管机 `macos-15-intel`（x86_64）上安装 Python 3.12，执行 `build_macos.sh`，并把打好的应用做成 zip 上传为 Actions 产物。当前 Actions 产物是 **Intel Mac（x86_64）** 专用；Apple Silicon（M 系列）若需要，应另打 arm64 包。应用没有签名，也没有公证。Windows 的 `build_windows.bat` / `build_windows.ps1` 不变，这个工作流不负责 Windows exe。
 
 如果代码还只在 Origin 草稿里，GitHub 不会跑这个工作流。先在 GitHub 建一个空仓库（不要勾选自动生成 README，免得和现有历史冲突），再把 `main` 推上去：
 
@@ -139,7 +139,7 @@ git push -u github main
 - 再次把提交推到 `main`，工作流自动跑。
 - 打开仓库的 **Actions**，左侧选 **Build macOS app**，点 **Run workflow**，分支选 `main`。手动按钮要等工作流文件已经在默认分支上才会出现。
 
-构建成功后，打开那次运行，在 **Artifacts** 里下载 `image-workbench-macos`。GitHub 会再包一层 zip。解压后看到 `图片工坊-macos.zip`，再解压一次得到 `图片工坊.app`。产物保留 30 天。
+构建成功后，打开那次运行，在 **Artifacts** 里下载 `image-workbench-macos`。GitHub 会再包一层 zip。解压后看到 `图片工坊-macos.zip`，再解压一次得到 `图片工坊.app`。该产物为 **Intel x86_64**，适用于 Intel 处理器的 Mac；产物保留 30 天。
 
 Gatekeeper 会拦住从网络下载的未签名应用。把 `.app` 拖进「应用程序」后，按住 Control 点它，选「打开」，在对话框里再确认一次。若仍然提示已损坏或无法打开，在终端执行：
 
@@ -166,7 +166,7 @@ build_windows.bat       Windows 打包
 build_windows.ps1       Windows 打包（PowerShell）
 build_macos.sh          macOS 本地打包（生成 图片工坊.app）
 .github/workflows/build-macos.yml
-                        GitHub Actions：macos-latest 上打包并上传 zip
+                        GitHub Actions：macos-15-intel（x86_64）上打包并上传 zip
 requirements.txt        运行依赖
 requirements-build.txt  打包时额外需要的 PyInstaller
 ```
